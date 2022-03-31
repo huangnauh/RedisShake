@@ -2,15 +2,16 @@ package dbSync
 
 import (
 	"bufio"
-	"github.com/alibaba/RedisShake/pkg/libs/log"
-	"github.com/alibaba/RedisShake/redis-shake/base"
-	"github.com/alibaba/RedisShake/redis-shake/common"
-	"github.com/alibaba/RedisShake/redis-shake/heartbeat"
-	"github.com/alibaba/RedisShake/redis-shake/metric"
 	"io"
 
+	"github.com/alibaba/RedisShake/pkg/libs/log"
+	"github.com/alibaba/RedisShake/redis-shake/base"
+	utils "github.com/alibaba/RedisShake/redis-shake/common"
+	"github.com/alibaba/RedisShake/redis-shake/heartbeat"
+	"github.com/alibaba/RedisShake/redis-shake/metric"
+
 	"github.com/alibaba/RedisShake/redis-shake/checkpoint"
-	"github.com/alibaba/RedisShake/redis-shake/configure"
+	conf "github.com/alibaba/RedisShake/redis-shake/configure"
 )
 
 // one sync link corresponding to one DbSyncer
@@ -94,7 +95,7 @@ func (ds *DbSyncer) Sync() {
 		}
 
 		// checkpoint reload if has
-		log.Infof("DbSyncer[%d] enable resume from break point, try to load checkpoint", ds.id)
+		log.Infof("DbSyncer[%d] enable resume from break point %s, try to load checkpoint", ds.id, ds.checkpointName)
 		runId, offset, dbid, err = checkpoint.LoadCheckpoint(ds.id, ds.source, ds.target, conf.Options.TargetAuthType,
 			ds.targetPassword, ds.checkpointName, conf.Options.TargetType == conf.RedisTypeCluster, conf.Options.SourceTLSEnable,
 			conf.Options.SourceTLSSkipVerify)
@@ -102,7 +103,7 @@ func (ds *DbSyncer) Sync() {
 			log.Panicf("DbSyncer[%d] load checkpoint from %v failed[%v]", ds.id, ds.target, err)
 			return
 		}
-		log.Infof("DbSyncer[%d] checkpoint info: runId[%v], offset[%v] dbid[%v]", ds.id, runId, offset, dbid)
+		log.Infof("DbSyncer[%d] checkpoint %s info: runId[%v], offset[%v] dbid[%v]", ds.id, ds.checkpointName, runId, offset, dbid)
 	}
 
 	base.Status = "waitfull"

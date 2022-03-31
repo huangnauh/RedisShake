@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/alibaba/RedisShake/redis-shake/configure"
+	conf "github.com/alibaba/RedisShake/redis-shake/configure"
 )
 
 const (
@@ -155,12 +155,18 @@ func parseAddress(tp, address, redisType string, isSource bool) error {
 			slaveAddressList, _ := GetAllClusterNode(client, conf.StandAloneRoleSlave, "address")
 			if masterAddressList != nil && slaveAddressList != nil {
 				if !CompareUnorderedList(masterAddressList, addressList) && !CompareUnorderedList(slaveAddressList, addressList) {
-					endpoint := "source"
-					if !isSource {
-						endpoint = "target"
+					if len(masterAddressList) > len(slaveAddressList) {
+						address = strings.Join(masterAddressList, AddressClusterSplitter)
+					} else {
+						address = strings.Join(slaveAddressList, AddressClusterSplitter)
 					}
-					return fmt.Errorf("[%s] redis address should be all masters or all slaves, master:[%v], slave[%v]",
-						endpoint, masterAddressList, slaveAddressList)
+					// endpoint := "source"
+					// if !isSource {
+					// 	endpoint = "target"
+					// }
+
+					// return fmt.Errorf("[%s] redis address should be all masters or all slaves, master:[%v], slave[%v]",
+					// 	endpoint, masterAddressList, slaveAddressList)
 				}
 			}
 

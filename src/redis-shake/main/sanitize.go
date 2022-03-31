@@ -452,6 +452,11 @@ func SanitizeOptions(tp string) error {
 			return fmt.Errorf("target.dbmap should only empty if enable resume_from_break_point")
 		}
 
+		if conf.Options.SourceType == conf.RedisTypeCluster &&
+			conf.Options.TargetType == conf.RedisTypeStandalone {
+			return nil
+		}
+
 		// check db type
 		if conf.Options.SourceType != conf.Options.TargetType {
 			return fmt.Errorf("source type must equal to the target type when 'resume_from_break_point == true'"+

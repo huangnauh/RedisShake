@@ -2,11 +2,12 @@ package checkpoint
 
 import (
 	"fmt"
-	"github.com/alibaba/RedisShake/pkg/libs/log"
-	"github.com/alibaba/RedisShake/redis-shake/common"
-	redigo "github.com/garyburd/redigo/redis"
 	"strconv"
 	"strings"
+
+	"github.com/alibaba/RedisShake/pkg/libs/log"
+	utils "github.com/alibaba/RedisShake/redis-shake/common"
+	redigo "github.com/garyburd/redigo/redis"
 )
 
 func LoadCheckpoint(dbSyncerId int, sourceAddr string, target []string, authType, passwd string,
@@ -31,7 +32,7 @@ func LoadCheckpoint(dbSyncerId int, sourceAddr string, target []string, authType
 	var recDb int32
 	var recVersion = -1
 	for db := range mp {
-		log.Infof("DbSyncer[%d] load checkpoint check db[%v]", dbSyncerId, db)
+		log.Infof("DbSyncer[%d] load checkpoint %s check db[%v]", dbSyncerId, checkpointName, db)
 		runId, offset, version, err := fetchCheckpoint(sourceAddr, c, int(db), checkpointName)
 		if err != nil {
 			return "", 0, 0, err
